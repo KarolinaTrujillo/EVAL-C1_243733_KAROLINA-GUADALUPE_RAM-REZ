@@ -96,9 +96,6 @@ Crear un archivo `.env` en la raíz del proyecto:
 
 ```env
 # .env (raíz del proyecto)
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=biblioteca
 ```
 
 Crea un archivo `.env.local` en `evaprac-karo/` (opcional, solo para desarrollo local):
