@@ -1,10 +1,5 @@
 import { pool } from "@/lib/db";
-import { paginationSchema } from "@/lib/schemas";
-import { z } from "zod";
-
-const overdueFilterSchema = z.object({
-  min_days_atraso: z.coerce.number().min(0).default(0),
-});
+import { paginationSchema, overdueFilterSchema } from "@/lib/schemas";
 
 export default async function Report2({ 
   searchParams 
@@ -26,42 +21,80 @@ export default async function Report2({
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
-      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>Préstamos vencidos</h1>
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total de préstamos vencidos: {rows.length}</p>
+      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>
+        Préstamos vencidos
+      </h1>
+
+      <p style={{ color: "#031631", marginBottom: "20px", fontSize: "14px" }}>
+        Identifica préstamos con atraso y la multa sugerida para cada uno.
+      </p>
+
+      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px"}}>
+         <input 
+          type="number" 
+          name="min_days_atraso" 
+          defaultValue={min_days_atraso === 0 ? "" : min_days_atraso}
+          placeholder="Días mínimos" 
+          min="0"
+          style={{ padding: "5px", marginRight: "5px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
+        />
+        <input 
+          type="number" 
+          name="limit" 
+          defaultValue={limit}
+          placeholder="Por página" 
+          min="1"
+          max="20"
+          style={{ padding: "5px", marginRight: "5px", width: "110px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
+        />
+        <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", border: "none", cursor: "pointer" }}>
+          Filtrar
+        </button>
+      </form>
+
+      <div style={{ 
+        backgroundColor: "#041c3f", 
+        color: "white",
+        padding: "15px", 
+        borderRadius: "5px",
+        marginBottom: "20px"
+      }}>
+        <strong>Préstamos en esta página: {rows.length}</strong>
+      </div>
 
       {rows.length === 0 ? (
-        <p style={{ color: "#031631" }}>No hay préstamos vencidos.</p>
+        <p style={{ color: "#031631" }}>No hay préstamos con esos filtros.</p>
       ) : (
-        <table style={{ 
-          width: "100%", 
-          borderCollapse: "collapse", 
-          backgroundColor: "white",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-        }}>
-          <thead>
-            <tr style={{ backgroundColor: "#041c3f" }}>
-              <th style={{ padding: "12px", textAlign: "left" }}>Préstamo ID</th>
-              <th style={{ padding: "12px", textAlign: "left" }}>Miembro</th>
-              <th style={{ padding: "12px", textAlign: "left" }}>Libro</th>
-              <th style={{ padding: "12px", textAlign: "center" }}>Días atraso</th>
-              <th style={{ padding: "12px", textAlign: "right" }}>Multa sugerida</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r: any, idx: number) => (
-              <tr key={r.loan_id} style={{ 
-                backgroundColor: idx % 2 === 0 ? "#13406539" : "white",
-                borderBottom: "1px solid #205682"
-              }}>
-                <td style={{ padding: "12px", color: "#0d47a1" }}>{r.loan_id}</td>
-                <td style={{ padding: "12px", color: "#0d47a1" }}>{r.member_name}</td>
-                <td style={{ padding: "12px", color: "#0d47a1" }}>{r.book_title}</td>
-                <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.dias_atraso}</td>
-                <td style={{ padding: "12px", textAlign: "right", color: "#0d47a1" }}>${r.multa_sugerida}</td>
+        <>
+          <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.54)" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#041c3f" }}>
+                <th style={{ padding: "12px" }}>ID</th>
+                <th style={{ padding: "12px" }}>Miembro</th>
+                <th style={{ padding: "12px" }}>Libro</th>
+                <th style={{ padding: "12px" }}>Días</th>
+                <th style={{ padding: "12px" }}>Multa</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((r: any, idx: number) => (
+                <tr key={r.loan_id} style={{ backgroundColor: idx % 2 === 0 ? "#13406539" : "white", borderBottom: "1px solid #205682" }}>
+                  <td style={{ padding: "12px", color: "#0d47a1" }}>{r.loan_id}</td>
+                  <td style={{ padding: "12px", color: "#0d47a1" }}>{r.member_name}</td>
+                  <td style={{ padding: "12px", color: "#0d47a1" }}>{r.book_title}</td>
+                  <td style={{ padding: "12px", color: "#0d47a1" }}>{r.dias_atraso}</td>
+                  <td style={{ padding: "12px", color: "#0d47a1" }}>${r.multa_sugerida}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={{ marginTop: "15px", textAlign: "center" }}>
+            {page > 1 && <a href={`/reports/2?min_days_atraso=${min_days_atraso}&page=${page - 1}&limit=${limit}`} style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", textDecoration: "none", marginRight: "5px" }}>Anterior</a>}
+            <span style={{ color: "#031631" }}>Página {page}</span>
+            {rows.length === limit && <a href={`/reports/2?min_days_atraso=${min_days_atraso}&page=${page + 1}&limit=${limit}`} style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", textDecoration: "none", marginLeft: "5px" }}>Siguiente</a>}
+          </div>
+        </>
       )}
     </div>
   );

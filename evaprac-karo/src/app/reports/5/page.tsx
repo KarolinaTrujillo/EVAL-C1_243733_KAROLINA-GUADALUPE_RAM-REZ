@@ -19,39 +19,50 @@ export default async function Report5({
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
-      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>Salud del inventario</h1>
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total de categorías: {rows.length}</p>
+      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>
+        Salud del inventario
+      </h1>
 
-      <table style={{ 
-        width: "100%", 
-        borderCollapse: "collapse", 
-        backgroundColor: "white",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
+      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
+        <input 
+          type="number" 
+          name="limit" 
+          defaultValue={limit === 5 ? "" : limit} 
+          placeholder="Por página" 
+          style={{ padding: "5px", marginRight: "5px", width: "100px",  color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} />
+        <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", border: "none", cursor: "pointer" }}>Aplicar</button>
+      </form>
+
+      <p style={{ color: "#031631", marginBottom: "20px" }}>Total en esta página: {rows.length}</p>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.54)" }}>
         <thead>
           <tr style={{ backgroundColor: "#041c3f"}}>
-            <th style={{ padding: "12px", textAlign: "left" }}>Categoría</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Total copias</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Disponibles</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Prestados</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Perdidos</th>
+            <th style={{ padding: "12px" }}>Categoría</th>
+            <th style={{ padding: "12px" }}>Copias</th>
+            <th style={{ padding: "12px" }}>Disponibles</th>
+            <th style={{ padding: "12px" }}>Prestados</th>
+            <th style={{ padding: "12px" }}>Perdidos</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r: any, idx: number) => (
-            <tr key={idx} style={{ 
-              backgroundColor: idx % 2 === 0 ? "#13406539" : "white",
-              borderBottom: "1px solid #205682"
-            }}>
+            <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? "#13406539" : "white", borderBottom: "1px solid #205682" }}>
               <td style={{ padding: "12px", color: "#0d47a1" }}>{r.category}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.total_copias}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.disponibles}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.prestados}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.perdidos}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.total_copias}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.disponibles}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.prestados}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.perdidos}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <div style={{ marginTop: "15px", textAlign: "center" }}>
+        {page > 1 && <a href={`/reports/5?page=${page - 1}&limit=${limit}`} style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", textDecoration: "none", marginRight: "5px" }}>Anterior</a>}
+        <span style={{ color: "#031631" }}>Página {page}</span>
+        {rows.length === limit && <a href={`/reports/5?page=${page + 1}&limit=${limit}`} style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", textDecoration: "none", marginLeft: "5px" }}>Siguiente</a>}
+      </div>
     </div>
   );
 }

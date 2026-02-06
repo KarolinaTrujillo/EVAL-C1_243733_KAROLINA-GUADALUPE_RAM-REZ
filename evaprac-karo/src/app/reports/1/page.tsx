@@ -7,8 +7,23 @@ export default async function Report1() {
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
-      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>Libros más prestados</h1>
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total de libros: {rows.length}</p>
+      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>
+        Libros más prestados
+      </h1>
+      
+      <p style={{ color: "#031631", marginBottom: "20px", fontSize: "14px" }}>
+        Este reporte muestra el ranking de libros según la cantidad total de préstamos históricos.
+      </p>
+
+      <div style={{ 
+        backgroundColor: "#041c3f", 
+        color: "white",
+        padding: "15px", 
+        borderRadius: "5px",
+        marginBottom: "20px"
+      }}>
+        <strong>Total de libros prestados: {rows.length}</strong>
+      </div>
       
       <table style={{ 
         width: "100%", 

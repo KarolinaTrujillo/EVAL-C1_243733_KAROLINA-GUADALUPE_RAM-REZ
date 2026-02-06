@@ -6,5 +6,5 @@ export const paginationSchema = z.object({
 });
 
 export const overdueFilterSchema = z.object({
-  min_days_atraso: z.coerce.number().min(1).default(1),
+  min_days_atraso: z.coerce.number().min(0).default(0),
 });

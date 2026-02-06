@@ -22,35 +22,41 @@ export default async function Report4({
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
-      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>Actividad de socios</h1>
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total de miembros activos: {rows.length}</p>
+      <h1 style={{ color: "#031631", marginBottom: "10px", fontWeight: "bold", fontSize: "24px" }}>
+        Actividad de socios
+      </h1>
 
-      <table style={{ 
-        width: "100%", 
-        borderCollapse: "collapse", 
-        backgroundColor: "white",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
+      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
+        <input 
+          type="number" 
+          name="min_loans" 
+          defaultValue={min_loans === 0 ? "" : min_loans}
+          placeholder="Préstamos mínimos" 
+          style={{ padding: "5px", marginRight: "5px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
+        />
+        <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", cursor: "pointer"}}>Filtrar</button>
+      </form>
+
+      <p style={{ color: "#031631", marginBottom: "20px" }}>Total: {rows.length}</p>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.54)" }}>
         <thead>
           <tr style={{ backgroundColor: "#041c3f"}}>
-            <th style={{ padding: "12px", textAlign: "left" }}>ID</th>
-            <th style={{ padding: "12px", textAlign: "left" }}>Nombre</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Total préstamos</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Préstamos atrasados</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Tasa atraso</th>
+            <th style={{ padding: "12px" }}>ID</th>
+            <th style={{ padding: "12px" }}>Nombre</th>
+            <th style={{ padding: "12px" }}>Préstamos</th>
+            <th style={{ padding: "12px" }}>Atrasados</th>
+            <th style={{ padding: "12px" }}>Tasa %</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r: any, idx: number) => (
-            <tr key={r.member_id} style={{ 
-              backgroundColor: idx % 2 === 0 ? "#13406539" : "white",
-              borderBottom: "1px solid #205682"
-            }}>
+            <tr key={r.member_id} style={{ backgroundColor: idx % 2 === 0 ? "#13406539" : "white", borderBottom: "1px solid #205682" }}>
               <td style={{ padding: "12px", color: "#0d47a1" }}>{r.member_id}</td>
               <td style={{ padding: "12px", color: "#0d47a1" }}>{r.name}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.total_prestamos}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.prestamos_atrasados}</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#0d47a1" }}>{r.tasa_atraso}%</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.total_prestamos}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.prestamos_atrasados}</td>
+              <td style={{ padding: "12px", color: "#0d47a1" }}>{r.tasa_atraso}%</td>
             </tr>
           ))}
         </tbody>
