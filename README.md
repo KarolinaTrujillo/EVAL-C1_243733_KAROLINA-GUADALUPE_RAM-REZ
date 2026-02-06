@@ -82,6 +82,43 @@ El sistema implementa 5 reportes clave:
 ### DevOps
 - **Docker** - Contenedores para desarrollo y producción
 - **Docker Compose** - Orquestación multi-contenedor
+
+---
+
+## Uso de Inteligencia Artificial en el Proyecto
+
+### Herramientas de IA Utilizadas
+- **Claude/ChatGPT** - Generación de código, consultas y resolución de problemas
+
+### Componentes Desarrollados con Asistencia de IA
+
+#### 1. **Estructura de Base de Datos (db/)**
+- Creación de vistas optimizadas (`reports_vw.sql`)
+- Scripts de migración y seed data
+
+#### 2. **Configuración Docker**
+- Dockerfile multi-stage optimizado para Next.js
+
+#### 3. **Backend/Conexión a Base de Datos**
+- Pool de conexiones PostgreSQL (`lib/db.ts`)
+- Schemas de validación con Zod (`lib/schemas.ts`)
+- Manejo de errores y tipado TypeScript
+
+#### 4. **Frontend - Páginas de Reportes**
+- Ayuda con el diseño de interfaz
+- **Reportes específicos:**
+  - `reports/1/page.tsx` - Libros más prestados
+  - `reports/2/page.tsx` - Préstamos vencidos con filtros
+  - `reports/3/page.tsx` - Resumen de multas
+  - `reports/4/page.tsx` - Actividad de miembros
+  - `reports/5/page.tsx` - Estado del inventario
+
+#### 6. **Documentación**
+- README completo con instrucciones de setup
+- Comentarios en código TypeScript
+- Documentación de arquitectura de carpetas
+- Explicación de índices y optimizaciones
+
 ---
 
 ## Comandos para Levantar el Proyecto desde 0
