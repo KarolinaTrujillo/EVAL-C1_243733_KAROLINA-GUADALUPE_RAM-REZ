@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { pool } from "@/lib/db";
 import { z } from "zod";
 
@@ -26,6 +27,10 @@ export default async function Report4({
         Actividad de socios
       </h1>
 
+      <p style={{ color: "#031631", marginBottom: "20px", fontSize: "14px" }}>
+        Analiza el comportamiento de los miembros según sus préstamos y tasa de atraso.
+      </p>
+
       <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
         <input 
           type="number" 
@@ -34,10 +39,18 @@ export default async function Report4({
           placeholder="Préstamos mínimos" 
           style={{ padding: "5px", marginRight: "5px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
         />
-        <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", cursor: "pointer"}}>Filtrar</button>
+        <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", border: "none", cursor: "pointer" }}>Filtrar</button>
       </form>
 
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total: {rows.length}</p>
+      <div style={{ 
+        backgroundColor: "#041c3f", 
+        color: "white",
+        padding: "15px", 
+        borderRadius: "5px",
+        marginBottom: "20px"
+      }}>
+        <strong>Total de miembros activos: {rows.length}</strong>
+      </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.54)" }}>
         <thead>

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { pool } from "@/lib/db";
 import { paginationSchema } from "@/lib/schemas";
 
@@ -23,17 +24,30 @@ export default async function Report5({
         Salud del inventario
       </h1>
 
+      <p style={{ color: "#031631", marginBottom: "20px", fontSize: "14px" }}>
+        Monitorea el estado de las copias por categoría: disponibles, prestadas y perdidas.
+      </p>
+
       <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
         <input 
           type="number" 
           name="limit" 
-          defaultValue={limit === 5 ? "" : limit} 
+          defaultValue={limit === 5 ? "" : limit}
           placeholder="Por página" 
-          style={{ padding: "5px", marginRight: "5px", width: "100px",  color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} />
+          style={{ padding: "5px", marginRight: "5px", width: "100px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
+        />
         <button type="submit" style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", border: "none", cursor: "pointer" }}>Aplicar</button>
       </form>
 
-      <p style={{ color: "#031631", marginBottom: "20px" }}>Total en esta página: {rows.length}</p>
+      <div style={{ 
+        backgroundColor: "#041c3f", 
+        color: "white",
+        padding: "15px", 
+        borderRadius: "5px",
+        marginBottom: "20px"
+      }}>
+        <strong>Categorías en esta página: {rows.length}</strong>
+      </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.54)" }}>
         <thead>

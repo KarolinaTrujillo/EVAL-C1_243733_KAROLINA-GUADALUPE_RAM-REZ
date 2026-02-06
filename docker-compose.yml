@@ -1,18 +1,55 @@
-version: '3.8'
-
 services:
+  # Servicio de PostgreSQL
   postgres:
     image: postgres:15-alpine
     container_name: postgres_biblioteca
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: biblioteca
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-biblioteca}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+      - ./db/indexes.sql:/docker-entrypoint-initdb.d/03_indexes.sql
+      - ./db/reports_vw.sql:/docker-entrypoint-initdb.d/04_reports_vw.sql
+      - ./db/roles.sql:/docker-entrypoint-initdb.d/05_roles.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - biblioteca-network
+    restart: unless-stopped
+
+  # Servicio de Next.js
+  nextjs:
+    build:
+      context: ./evaprac-karo
+      dockerfile: Dockerfile
+    container_name: nextjs_biblioteca
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-biblioteca}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB:-biblioteca}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - biblioteca-network
     restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  biblioteca-network:
+    driver: bridge
