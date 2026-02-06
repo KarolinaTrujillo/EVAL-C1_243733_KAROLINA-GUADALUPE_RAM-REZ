@@ -35,7 +35,7 @@ export default async function Report2({
           type="number" 
           name="min_days_atraso" 
           defaultValue={min_days_atraso === 0 ? "" : min_days_atraso}
-          placeholder="Días mínimos" 
+          placeholder="Días" 
           min="0"
           style={{ padding: "5px", marginRight: "5px", color: "#031631", borderColor: "#031631", borderWidth: "1px", borderStyle: "solid" }} 
         />
