@@ -1,24 +1,47 @@
-export const dynamic = 'force-dynamic';
-import { pool } from "@/lib/db";
-import { paginationSchema, overdueFilterSchema } from "@/lib/schemas";
+'use client';
 
-export default async function Report2({ 
-  searchParams 
-}: { 
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
-}) {
-  const params = await searchParams;
-  const { min_days_atraso } = overdueFilterSchema.parse(params);
-  const { page, limit } = paginationSchema.parse(params);
-  const offset = (page - 1) * limit;
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-  const { rows } = await pool.query(
-    `SELECT * FROM vw_overdue_loans 
-     WHERE dias_atraso >= $1 
-     ORDER BY dias_atraso DESC 
-     LIMIT $2 OFFSET $3`,
-    [min_days_atraso, limit, offset]
-  );
+function Report2Content() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+  const [min_days_atraso, setMinDaysAtraso] = useState(0);
+
+  useEffect(() => {
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    const minDaysParam = searchParams.get('min_days_atraso');
+    
+    if (pageParam) setPage(Number(pageParam));
+    if (limitParam) setLimit(Number(limitParam));
+    if (minDaysParam) setMinDaysAtraso(Number(minDaysParam));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/reports/2?page=${page}&limit=${limit}&min_days_atraso=${min_days_atraso}`)
+      .then(res => res.json())
+      .then(data => {
+        setRows(data.rows);
+        setLoading(false);
+      });
+  }, [page, limit, min_days_atraso]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newMinDays = Number(formData.get('min_days_atraso')) || 0;
+    const newLimit = Number(formData.get('limit')) || 5;
+    router.push(`/reports/2?min_days_atraso=${newMinDays}&page=1&limit=${newLimit}`);
+  };
+
+  if (loading) return <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>;
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
@@ -30,7 +53,7 @@ export default async function Report2({
         Identifica préstamos con atraso y la multa sugerida para cada uno.
       </p>
 
-      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px"}}>
+      <form onSubmit={handleSubmit} style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px"}}>
          <input 
           type="number" 
           name="min_days_atraso" 
@@ -98,5 +121,13 @@ export default async function Report2({
         </>
       )}
     </div>
+  );
+}
+
+export default function Report2() {
+  return (
+    <Suspense fallback={<div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>}>
+      <Report2Content />
+    </Suspense>
   );
 }

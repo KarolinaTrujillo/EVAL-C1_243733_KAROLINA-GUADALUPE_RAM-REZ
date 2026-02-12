@@ -1,25 +1,39 @@
-export const dynamic = 'force-dynamic';
-import { pool } from "@/lib/db";
-import { z } from "zod";
+'use client';
 
-const filterSchema = z.object({
-  min_loans: z.coerce.number().min(0).default(0),
-});
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-export default async function Report4({ 
-  searchParams 
-}: { 
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
-}) {
-  const params = await searchParams;
-  const { min_loans } = filterSchema.parse(params);
+function Report4Content() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [min_loans, setMinLoans] = useState(0);
 
-  const { rows } = await pool.query(
-    `SELECT * FROM vw_member_activity 
-     WHERE total_prestamos >= $1 
-     ORDER BY total_prestamos DESC`,
-    [min_loans]
-  );
+  useEffect(() => {
+    const minLoansParam = searchParams.get('min_loans');
+    if (minLoansParam) setMinLoans(Number(minLoansParam));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/reports/4?min_loans=${min_loans}`)
+      .then(res => res.json())
+      .then(data => {
+        setRows(data.rows);
+        setLoading(false);
+      });
+  }, [min_loans]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newMinLoans = Number(formData.get('min_loans')) || 0;
+    router.push(`/reports/4?min_loans=${newMinLoans}`);
+  };
+
+  if (loading) return <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>;
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
@@ -31,7 +45,7 @@ export default async function Report4({
         Analiza el comportamiento de los miembros según sus préstamos y tasa de atraso.
       </p>
 
-      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
+      <form onSubmit={handleSubmit} style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
         <input 
           type="number" 
           name="min_loans" 
@@ -75,5 +89,13 @@ export default async function Report4({
         </tbody>
       </table>
     </div>
+  );
+}
+
+export default function Report4() {
+  return (
+    <Suspense fallback={<div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>}>
+      <Report4Content />
+    </Suspense>
   );
 }

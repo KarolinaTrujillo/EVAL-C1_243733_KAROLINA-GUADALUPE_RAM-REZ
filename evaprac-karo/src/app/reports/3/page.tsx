@@ -1,13 +1,24 @@
-export const dynamic = 'force-dynamic';
-import { pool } from "@/lib/db";
+'use client';
 
-export default async function Report3() {
-  const { rows } = await pool.query(
-    "SELECT * FROM vw_fines_summary ORDER BY mes DESC"
-  );
+import { useEffect, useState } from "react";
+
+export default function Report3() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/reports/3')
+      .then(res => res.json())
+      .then(data => {
+        setRows(data);
+        setLoading(false);
+      });
+  }, []);
 
   const totalRecaudado = rows.reduce((sum: number, r: any) => sum + parseFloat(r.multas_pagadas || 0), 0);
   const totalPendiente = rows.reduce((sum: number, r: any) => sum + parseFloat(r.multas_pendientes || 0), 0);
+
+  if (loading) return <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>;
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>

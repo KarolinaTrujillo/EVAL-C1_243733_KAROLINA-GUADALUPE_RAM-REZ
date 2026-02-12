@@ -1,22 +1,43 @@
-export const dynamic = 'force-dynamic';
-import { pool } from "@/lib/db";
-import { paginationSchema } from "@/lib/schemas";
+'use client';
 
-export default async function Report5({ 
-  searchParams 
-}: { 
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
-}) {
-  const params = await searchParams;
-  const { page, limit } = paginationSchema.parse(params);
-  const offset = (page - 1) * limit;
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-  const { rows } = await pool.query(
-    `SELECT * FROM vw_inventory_health 
-     ORDER BY category 
-     LIMIT $1 OFFSET $2`,
-    [limit, offset]
-  );
+function Report5Content() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+
+  useEffect(() => {
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    
+    if (pageParam) setPage(Number(pageParam));
+    if (limitParam) setLimit(Number(limitParam));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/reports/5?page=${page}&limit=${limit}`)
+      .then(res => res.json())
+      .then(data => {
+        setRows(data.rows);
+        setLoading(false);
+      });
+  }, [page, limit]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newLimit = Number(formData.get('limit')) || 5;
+    router.push(`/reports/5?page=1&limit=${newLimit}`);
+  };
+
+  if (loading) return <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>;
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
@@ -28,7 +49,7 @@ export default async function Report5({
         Monitorea el estado de las copias por categoría: disponibles, prestadas y perdidas.
       </p>
 
-      <form method="GET" style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
+      <form onSubmit={handleSubmit} style={{ backgroundColor: "white", padding: "10px", marginBottom: "20px", borderRadius: "5px" }}>
         <input 
           type="number" 
           name="limit" 
@@ -78,5 +99,13 @@ export default async function Report5({
         {rows.length === limit && <a href={`/reports/5?page=${page + 1}&limit=${limit}`} style={{ padding: "5px 10px", backgroundColor: "#041c3f", color: "white", textDecoration: "none", marginLeft: "5px" }}>Siguiente</a>}
       </div>
     </div>
+  );
+}
+
+export default function Report5() {
+  return (
+    <Suspense fallback={<div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>}>
+      <Report5Content />
+    </Suspense>
   );
 }

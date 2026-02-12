@@ -1,10 +1,21 @@
-export const dynamic = 'force-dynamic';
-import { pool } from "@/lib/db";
+'use client';
 
-export default async function Report1() {
-  const { rows } = await pool.query(
-    "SELECT * FROM vw_most_borrowed_books ORDER BY ranking"
-  );
+import { useEffect, useState } from "react";
+
+export default function Report1() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/reports/1')
+      .then(res => res.json())
+      .then(data => {
+        setRows(data);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>Cargando...</div>;
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#b0c2d6", minHeight: "100vh" }}>
